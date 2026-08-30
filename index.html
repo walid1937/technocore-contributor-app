@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technocore Contributor</title>
+    <!-- Tailwind CSS (No Build Required) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: #000; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
+        .hide { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full">
+        <!-- Progress Bar -->
+        <div class="mb-8 flex justify-between items-center px-2">
+           <span class="text-xs font-bold text-gray-500 tracking-widest uppercase">Technocore Setup</span>
+           <span id="step-counter" class="text-xs font-bold text-blue-500">1 / 10</span>
+        </div>
+        <div class="h-1 w-full bg-gray-900 rounded-full mb-8 overflow-hidden">
+           <div id="progress-bar" class="h-full bg-blue-600 transition-all duration-500" style="width: 10%;"></div>
+        </div>
+        
+        <!-- Main Application Card -->
+        <div class="bg-gray-950 border border-gray-800 shadow-2xl rounded-2xl p-8" id="app-container">
+            <!-- Content gets injected here by JavaScript -->
+        </div>
+
+        <!-- Security Badge -->
+        <div class="mt-8 text-center flex items-center justify-center gap-2 text-xs text-gray-600">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+            <span>Local execution only. Keys never leave your device.</span>
+        </div>
+    </div>
+
+    <script>
+        // --- State ---
+        let step = 1;
+        let data = {
+            did: 'did:key:z6Mksquga7BbhDEjS6xdexNiaTHa5cnMPozUn6tfqJF5imgz',
+            repoUrl: 'https://github.com/zunmax/technocore-did-starter',
+            commit: '3cc03a6e908e8776de9fdd465c53d23d31db2e9f'
+        };
+
+        const container = document.getElementById('app-container');
+
+        // --- Core Functions ---
+        function updateProgress() {
+            document.getElementById('step-counter').innerText = `${step} / 10`;
+            document.getElementById('progress-bar').style.width = `${(step / 10) * 100}%`;
+        }
+
+        window.nextStep = () => {
+            step++;
+            updateProgress();
+            renderStep();
+        };
+
+        window.simulateProcess = (btnId, loadingText, time, callback) => {
+            const btn = document.getElementById(btnId);
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<span class="animate-pulse">${loadingText}</span>`;
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                callback();
+            }, time);
+        };
+
+        window.copyDID = () => {
+            navigator.clipboard.writeText(data.did);
+            const btn = document.getElementById('copy-btn');
+            btn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-green-500"></i> Copied!`;
+            lucide.createIcons();
+            setTimeout(() => {
+                btn.innerHTML = `<i data-lucide="copy" class="w-4 h-4"></i> Copy DID`;
+                lucide.createIcons();
+            }, 2000);
+        };
+
+        // --- Step Renderers ---
+        function renderStep() {
+            let html = '';
+            
+            if (step === 1) {
+                html = `
+                    <div class="text-center space-y-6">
+                        <h1 class="text-3xl font-bold text-white">Welcome to Technocore Contributor</h1>
+                        <p class="text-gray-300 max-w-md mx-auto">
+                            This app helps you create your Technocore DID, make a signed contribution, create proof of your contribution, and verify it.<br><br>
+                            <span class="text-green-400 font-semibold">You don't need to know Python or Git.</span>
+                        </p>
+                        <button onclick="nextStep()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition w-full">Start Setup</button>
+                    </div>`;
+            } 
+            else if (step === 2) {
+                html = `
+                    <div class="space-y-6">
+                        <h2 class="text-2xl font-bold text-white mb-4">System Check</h2>
+                        <div class="space-y-3 bg-gray-900 p-6 rounded-lg font-mono text-sm text-gray-300">
+                            <div class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 mr-2"></i> Windows 10/11 (64-bit)</div>
+                            <div class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 mr-2"></i> Internet connection verified</div>
+                            <div class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 mr-2"></i> Python 3.12.10 (✅ Compatible)</div>
+                            <div class="flex items-center"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 mr-2"></i> Git 2.x.x (✅ Ready)</div>
+                        </div>
+                        <p class="text-sm text-gray-400 text-center">Python runs the tool. Git manages the project files.</p>
+                        <button onclick="nextStep()" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-bold transition">Continue</button>
+                    </div>`;
+            }
+            else if (step === 3) {
+                html = `
+                    <div class="space-y-6">
+                        <h2 class="text-2xl font-bold text-white">Download Starter</h2>
+                        <div class="bg-gray-900 p-6 rounded-lg text-gray-300 font-mono text-sm space-y-4">
+                            <p class="text-blue-400">Repository:</p>
+                            <p>github.com/zunmax/technocore-did-starter</p>
+                            <p class="text-blue-400">Location:</p>
+                            <p>C:\\Users\\USERNAME\\Technocore</p>
+                        </div>
+                        <button id="dl-btn" onclick="simulateProcess('dl-btn', 'Downloading...', 1500, nextStep)" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-bold flex justify-center items-center gap-2">
+                            <i data-lucide="download" class="w-5 h-5"></i> Download Repository
+                        </button>
+                    </div>`;
+            }
+            else if (step === 4) {
+                html = `
+                    <div class="space-y-6 text-center">
+                        <i data-lucide="terminal" class="w-12 h-12 text-blue-500 mx-auto animate-pulse"></i>
+                        <h2 class="text-2xl font-bold text-white">Preparing Environment</h2>
+                        <div class="bg-gray-900 p-4 rounded-lg text-left font-mono text-green-400 text-sm">
+                            <p>> py -3.12 -m venv .venv</p>
+                            <p>> python -m pip install --upgrade pip</p>
+                            <p>> python -m pip install -r requirements.txt</p>
+                            <p class="mt-2 text-gray-400">Please wait while we configure Python...</p>
+                        </div>
+                    </div>`;
+                setTimeout(nextStep, 2500);
+            }
+            else if (step === 5) {
+                html = `
+                    <div class="space-y-6">
+                        <h2 class="text-2xl font-bold text-white">Create Passphrase</h2>
+                        <div class="bg-orange-900/30 border border-orange-500/50 p-4 rounded-lg flex gap-3 text-orange-200 text-sm">
+                            <i data-lucide="shield-alert" class="w-6 h-6 flex-shrink-0"></i>
+                            <div>
+                                <p class="font-bold mb-1">Important: This protects your identity file.</p>
+                                <ul class="list-disc ml-4 space-y-1">
+                                    <li>Do NOT send your passphrase to anyone.</li>
+                                    <li>Do NOT post it on X or GitHub.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-gray-300 text-sm block mb-1">Passphrase</label>
+                                <input type="password" placeholder="••••••••••••••••" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500" />
+                            </div>
+                        </div>
+                        <button id="gen-btn" onclick="simulateProcess('gen-btn', 'Generating...', 1000, nextStep)" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-bold flex justify-center items-center gap-2">
+                            <i data-lucide="key" class="w-5 h-5"></i> Create My DID
+                        </button>
+                    </div>`;
+            }
+            else if (step === 6) {
+                html = `
+                    <div class="space-y-6">
+                        <h2 class="text-2xl font-bold text-white">Your Technocore DID</h2>
+                        <div class="bg-gray-900 border border-gray-700 p-4 rounded-lg">
+                            <p class="font-mono text-green-400 break-all text-sm">${data.did}</p>
+                            <button id="copy-btn" onclick="copyDID()" class="mt-3 flex items-center gap-2 text-sm text-gray-300 hover:text-white transition">
+                                <i data-lucide="copy" class="w-4 h-4"></i> Copy DID
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-300">
+                            Your DID is your <strong>public</strong> identity. It is safe to publish. <br>
+                            Your <code class="bg-gray-800 px-1 rounded">identity.pem</code> file and passphrase must remain private.
+                        </p>
+                        <div class="bg-red-900/20 border border-red-500/50 p-4 rounded-lg mt-4">
+                            <h3 class="font-bold text-red-400 flex items-center gap-2 mb-2"><i data-lucide="shield-alert" class="w-5 h-5"></i> BACKUP REQUIRED</h3>
+                            <p class="text-sm text-red-200">Anyone who obtains your identity.pem and passphrase can use your identity.</p>
+                        </div>
+                        <button onclick="nextStep()" class="w-full bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-lg font-bold transition">Save Backup & Continue</button>
+                    </div>`;
+            }
+            else if (step === 7) {
+                html = `
+                    <div class="space-y-6 text-center">
+                        <h2 class="text-2xl font-bold text-white">Testing Connection</h2>
+                        <div class="bg-gray-900 p-6 rounded-lg text-left font-mono text-sm space-y-2" id="term-box">
+                            <p class="text-gray-400">> python technocore_agent.py read lobby</p>
+                            <p class="text-yellow-400 animate-pulse mt-2">Connecting to network...</p>
+                        </div>
+                    </div>`;
+                setTimeout(() => {
+                    document.getElementById('term-box').innerHTML = `
+                        <p class="text-gray-400">> python technocore_agent.py read lobby</p>
+                        <p class="text-green-400 mt-2">✅ Connected</p>
+                        <p class="text-green-400">✅ Lobby readable</p>
+                        <p class="text-green-400">✅ Messages received</p>
+                        <p class="text-green-400">✅ DID environment working</p>
+                    `;
+                    setTimeout(nextStep, 1500);
+                }, 1500);
+            }
+            else if (step === 8) {
+                html = `
+                    <div class="space-y-6">
+                        <h2 class="text-2xl font-bold text-white">Make a Contribution</h2>
+                        <p class="text-gray-300">Choose what you created and provide the URL.</p>
+                        <select class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
+                            <option>Useful tool</option>
+                            <option>Guide / Tutorial</option>
+                            <option>Code / Script</option>
+                            <option>Other</option>
+                        </select>
+                        <div>
+                            <label class="text-gray-300 text-sm block mb-1">Contribution URL</label>
+                            <input type="text" value="${data.repoUrl}" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white font-mono text-sm focus:outline-none focus:border-blue-500" />
+                        </div>
+                        <button id="scan-btn" onclick="simulateProcess('scan-btn', 'Detecting Git Status...', 1500, nextStep)" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-bold transition">Scan Repository</button>
+                    </div>`;
+            }
+            else if (step === 9) {
+                const proofObj = {
+                    artifact_url: data.repoUrl,
+                    commit: data.commit,
+                    did: data.did,
+                    schema: "technocore-contribution-proof-v1",
+                    signature: "3045022100e...a9f" 
+                };
+                html = `
+                    <div class="space-y-6">
+                        <h2 class="text-2xl font-bold text-white">Proof Generated</h2>
+                        <div class="bg-gray-900 border border-gray-700 p-4 rounded-lg font-mono text-sm text-green-300 overflow-x-auto">
+                            <pre>${JSON.stringify(proofObj, null, 2)}</pre>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="text-green-500 w-5 h-5"></i>
+                            <span class="text-gray-300 text-sm">Commit ${data.commit.substring(0,7)} detected</span>
+                        </div>
+                        <button id="vrf-btn" onclick="simulateProcess('vrf-btn', 'Verifying...', 1000, nextStep)" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-bold transition">Verify Contribution</button>
+                    </div>`;
+            }
+            else if (step === 10) {
+                const tweetText = encodeURIComponent(`Just completed my Technocore contributor setup ✅\n\nDID: ${data.did}\nContribution: ${data.repoUrl}\n\nBuilding the Technocore ecosystem. ⚡`);
+                html = `
+                    <div class="space-y-6">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="check-circle-2" class="w-8 h-8"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-white">You're ready!</h2>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                                <h3 class="text-gray-400 font-bold mb-2 text-sm uppercase tracking-wider">Identity</h3>
+                                <ul class="text-sm space-y-1 text-gray-300">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> DID created</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Identity backed up</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                                <h3 class="text-gray-400 font-bold mb-2 text-sm uppercase tracking-wider">Proof</h3>
+                                <ul class="text-sm space-y-1 text-gray-300">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Commit detected</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Proof verified</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <a href="https://twitter.com/intent/tweet?text=${tweetText}" target="_blank" rel="noreferrer" class="w-full bg-black border border-gray-700 hover:bg-gray-900 text-white px-4 py-3 rounded-lg font-bold flex justify-center items-center gap-2 transition">
+                            <i data-lucide="twitter" class="w-5 h-5"></i> Share on X
+                        </a>
+                    </div>`;
+            }
+
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        // Initialize App
+        renderStep();
+    </script>
+</body>
+</html>
